@@ -21,9 +21,18 @@ namespace Zork
         [JsonIgnore]
         public IReadOnlyDictionary<Directions, Room> Neighbors => _neighbors;
 
-        public Room(string name = null)
+        [JsonProperty(Order = 4)]
+        public Item RoomItem;
+
+        public Room(string name = null, Item roomItem = null)
         {
             Name = name;
+            RoomItem = roomItem;
+        }
+
+        public void RemoveRoomItem()
+        {
+            RoomItem = null;
         }
 
         public static bool operator ==(Room lhs, Room rhs)

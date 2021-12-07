@@ -23,6 +23,8 @@ namespace Zork
         
         public string ExitMessage { get; set; }
 
+        private Item itemToTake;
+
         [JsonIgnore]
         public Player Player { get; private set; }
         [JsonIgnore]
@@ -51,7 +53,10 @@ namespace Zork
                 { "SOUTH", new Command("SOUTH", new string[] { "SOUTH", "S", "s", "south" }, game => Move(game, Directions.South)) },
                 { "EAST", new Command("EAST", new string[] { "EAST", "E", "e", "east"}, game => Move(game, Directions.East)) },
                 { "WEST", new Command("WEST", new string[] { "WEST", "W", "w", "west" }, game => Move(game, Directions.West)) },
-                { "REWARD", new Command("REWARD", new string[] { "REWARD", "R", "r", "reward" }, game => Reward()) }
+                { "INVENTORY", new Command("INVENTORY", new string[] { "INVENTORY", "I", "i", "inventory" }, game => DisplayInventory()) },
+                { "TAKE", new Command("TAKE", new string[] { "TAKE", "T", "t", "take" }, game => Take()) },
+                { "DROP", new Command("DROP", new string[] { "DROP", "D", "d", "drop" }, game => Drop()) },
+                { "CLEAR", new Command("CLEAR", new string[] { "CLEAR", "C", "c", "clear" }, game => Clear()) }
             };
         }
 
@@ -64,8 +69,6 @@ namespace Zork
             IInput = input;
             IInput.InputReceived += InputReceivedHandler;
 
-            DisplayWelcomeMessage();
-
             IsRunning = true;            
         }
 
@@ -74,21 +77,23 @@ namespace Zork
             Output.WriteLine(string.IsNullOrWhiteSpace(WelcomeMessage) ? "Welcome to Zork!" : WelcomeMessage);
         }
 
+        private void Clear()
+        {
+            Console.Clear();
+        }
+
         public static void Start(string defaultGameFilename, IInputService input, IOutputService output)
         {
             Instance = Load(defaultGameFilename);
             IInput = input;
             Output = output;
-            //Instance.LoadCommands();
-            Instance.DisplayWelcomeMessage();
             Instance.IsRunning = true;
-            //IInput.InputReceived += Instance.InputReceived;
         }
 
 
         private void InputReceivedHandler(object sender, string commandString)
         {
-            if (commandString.ToUpper().Trim().Equals("QUIT") || commandString.ToUpper().Trim().Equals("Q") commandString.ToUpper().Trim().Equals("quit") || commandString.ToUpper().Trim().Equals("q") || commandString.ToUpper().Trim().Equals("bye") || commandString.ToUpper().Trim().Equals("BYE"))
+            if (commandString.ToUpper().Trim().Equals("QUIT") || commandString.ToUpper().Trim().Equals("Q") || commandString.ToUpper().Trim().Equals("quit") || commandString.ToUpper().Trim().Equals("q") || commandString.ToUpper().Trim().Equals("bye") || commandString.ToUpper().Trim().Equals("BYE"))
             {
                 IsRunning = false;
             }
@@ -110,13 +115,129 @@ namespace Zork
             }
             else
             {
-                Output.WriteLine("Unknown command.");
+                Output.WriteLine("Unknown command.\n");
             }
         }
 
-        private void Reward()
+        private void Take()
         {
-            Player.Score += 5;
+            itemToTake = Player.Location.RoomItem;
+            if (itemToTake != null && itemToTake.IsTakeable)
+            {
+                Random rand = new Random();
+                switch (rand.Next(1, 4))
+                {
+                    case 1:
+                    Output.WriteLine($"Added {itemToTake} to your inventory.\n");
+                    break;
+
+                    case 2:
+                    Output.WriteLine($"Picked up the {itemToTake}.\n");
+                    break;
+
+                    default:
+                    Output.WriteLine($"Got the {itemToTake}.\n");
+                    break;
+                }
+                
+                Player.Score += itemToTake.ScoreValue;
+                itemToTake.AlreadyTaken = true;
+                Player.Inventory.Add(itemToTake);
+                Player.Location.RemoveRoomItem();
+            }
+            else if (itemToTake != null && !itemToTake.IsTakeable)
+            {
+                Random rand = new Random();
+                switch (rand.Next(1, 4))
+                {
+                    case 1:
+                        Output.WriteLine($"Nothing doing, there's no way that I can fit that {itemToTake} in my inventory.\n");
+                        break;
+
+                    case 2:
+                        Output.WriteLine($"Nope, I can't lift that {itemToTake} no matter how hard I try.\n");
+                        break;
+
+                    default:
+                        Output.WriteLine($"I may be good at carrying my teammates, but there's no way that I can carry that {itemToTake}.\n");
+                        break;
+                }
+            }
+            else if (itemToTake == null)
+            {
+                Output.WriteLine("There's nothing to take.");
+            }
+        }
+
+        private void Drop()
+        {
+            if ( Player.Inventory == null || Player.Inventory.Count == 0 )
+            {
+                Output.WriteLine("You don't have anything to drop.\n");
+            }
+            else
+            {
+                Item itemToDrop = Player.Inventory[0];
+                if (Player.Location.RoomItem == null)
+                {
+                    Random rand = new Random();
+                    switch (rand.Next(1, 4))
+                    {
+                        case 1:
+                            Output.WriteLine($"All right, you dropped the {itemToDrop}.\n");
+                            break;
+
+                        case 2:
+                            Output.WriteLine($"Threw the {itemToDrop} onto the ground.\n");
+                            break;
+
+                        default:
+                            Output.WriteLine($"Phew, I thought I'd never get rid of that {itemToDrop}.\n");
+                            break;
+                    }
+                    
+                    Player.Score -= itemToDrop.ScoreValue;
+                    Player.Location.RoomItem = itemToDrop;
+                    Player.Inventory.RemoveAt(0);
+                }
+                else
+                {
+                    Random rand = new Random();
+                    switch (rand.Next(1, 4))
+                    {
+                        case 1:
+                            Output.WriteLine($"There's already too many things in this room to be going around dropping a whole {itemToDrop} in it.\n");
+                            break;
+
+                        case 2:
+                            Output.WriteLine($"I remember what my mom always said: \"Player, you should never throw a {itemToDrop} onto the ground, especially if there's already a {Player.Location.RoomItem} in the room.\n");
+                            break;
+
+                        default:
+                            Output.WriteLine($"Nope, I shouldn't put too many items in this room.\n");
+                            break;
+                    }
+                    
+                }
+            }
+        }
+        public void DisplayInventory()
+        {
+            if ( Player.Inventory == null || Player.Inventory.Count == 0)
+            {
+                Output.WriteLine("You are carrying nothing except the clothes on your back.\n");
+            }
+            if (Player.Inventory != null && Player.Inventory.Count != 0)
+            {
+                Output.WriteLine("\nYour inventory consists of the following: \n\n=============\n");
+                foreach (Item item in Player.Inventory)
+                {
+                    string firstLetter = item.Name[0].ToString().ToUpper(), restOfWord = item.Name.Substring(1), wholeWord = firstLetter + restOfWord;
+                    Output.WriteLine(($"{wholeWord}: {item.Description}\n"));
+                }
+                Output.WriteLine("=============\n");
+            }
+                
         }
 
         private static void Move(Game game, Directions direction)
@@ -125,10 +246,6 @@ namespace Zork
             {
                 Output.WriteLine("The way is shut!");
             }
-            else
-            {
-                Output.WriteLine($"{game.Player.Location.Name}\n{game.Player.Location.Description}");
-            }
         }
 
         public static IInputService GetIInput()
@@ -136,9 +253,20 @@ namespace Zork
             return IInput;
         }
 
-        public static void Look(Game game) => Output.WriteLine(game.Player.Location.Description);
+        public static void Look(Game game)
+        {
+            Item tempItem = game.Player.Location.RoomItem;
 
-        //Refer to 24:15 in Part 1 video
+            if (tempItem != null)
+            {
+                Output.WriteLine(($"{game.Player.Location.Description} Additionally, there is a {tempItem} in here as well.\n"));
+            }
+            else
+            {
+                Output.WriteLine(($"{game.Player.Location.Description}\n"));
+            }
+        }
+
         public static void StartFromFile(string gamefilename, IOutputService outputService)
         {
             if (!File.Exists(gamefilename))
@@ -155,10 +283,9 @@ namespace Zork
         [OnDeserialized]
         private void OnDeserialized(StreamingContext context) => Player = new Player(World, StartingLocation);
    
-    public static Game Load(string defaultGameFilename) //11/12/21
+    public static Game Load(string defaultGameFilename)
         {
             Game game = JsonConvert.DeserializeObject<Game>(defaultGameFilename);
-            //game.Player = game.World.SpawnPlayer();
 
             return game;
         }

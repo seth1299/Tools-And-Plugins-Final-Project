@@ -8,7 +8,15 @@
           "North": "North of House",
           "South": "South of House",
           "West": "Forest 1"
-        }
+        },
+        "RoomItem": 
+          {
+            "Name": "rug adorned with pandas and cats",
+            "Description": "A throw rug with embroidery of cats and pandas on it.",
+            "IsTakeable": true,
+            "ScoreValue": 1
+          }
+  
       },
       {
         "Name": "North of House",
@@ -17,6 +25,12 @@
           "North": "Forest 2",
           "East": "Behind House",
           "West": "West of House"
+        },
+        "RoomItem": {
+          "Name": "cool rock",
+          "Description": "A rock you thought looked neat at the time, but you now realize looks just like all of the other rocks around here.",
+          "IsTakeable": true,
+          "ScoreValue": 1
         }
       },
       {
@@ -25,6 +39,12 @@
         "Neighbors": {
           "East": "Behind House",
           "West": "West of House"
+        },
+        "RoomItem": {
+          "Name": "DVD set of \"The Matrix\" series",
+          "Description": "This is the entire DVD box set of \"The Matrix\" series. Probably one of, if not the best, movie franchises to exist.",
+          "IsTakeable": true,
+          "ScoreValue": 5
         }
       },
       {
@@ -34,6 +54,12 @@
           "North": "North of House",
           "East": "Clearing",
           "South": "South of House"
+        },
+        "RoomItem": {
+          "Name": "ginormous statue of Malphite that's bigger than all of the broken chairs and computers in the CMB building combined",
+          "Description": "I... how did you get this in your inventory? I am speechless. Your powers are beyond my understanding.",
+          "IsTakeable": false,
+          "ScoreValue": 999999
         }
       },
       {
@@ -42,6 +68,12 @@
         "Neighbors": {
           "South": "Forest 3",
           "East": "West of House"
+        },
+        "RoomItem": {
+          "Name": "golden goose egg",
+          "Description": "A solid gold egg laid by a goose (you assume). This is probably worth some good money.",
+          "IsTakeable": true,
+          "ScoreValue": 20
         }
       },
       {
@@ -50,6 +82,12 @@
         "Neighbors": {
           "South": "Clearing",
           "East": "Clearing"
+        },
+        "RoomItem": {
+          "Name": "tibetian ritual dagger",
+          "Description": "A bronze dagger presumably used in rituals. Appears to be of Tibetian origin. Looks like an item in a video game that you would have one line of dialogue for, stick into a hole in a wall once, and then never come up in the story ever again.",
+          "IsTakeable": true,
+          "ScoreValue": 10
         }
       },
       {
@@ -58,6 +96,12 @@
         "Neighbors": {
           "North": "South of House",
           "East": "Clearing"
+        },
+        "RoomItem": {
+          "Name": "golden ring",
+          "Description": "This ring seems to have otherworldly powers surrounding it. When you touch it, you can almost hear a whisper in your ear in a language that you can't understand. You could also swear that you saw some form of written script appear on it, but there's nothing there now.",
+          "IsTakeable": true,
+          "ScoreValue": 100
         }
       },
       {
@@ -66,6 +110,12 @@
         "Neighbors": {
           "West": "Forest 2",
           "South": "Forest 3"
+        },
+        "RoomItem": {
+          "Name": "alien device",
+          "Description": "This device is alien to you and you can't seem to shake the feeling that it's not from this world. You're reminded of a quote: \"Two possibilities exist: either we are alone in the universe, or we are not. Either option is equally terrifying.\" -Arthur C. Clarke",
+          "IsTakeable": true,
+          "ScoreValue": 150
         }
       }
     ]

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace Zork
 {
@@ -7,6 +8,9 @@ namespace Zork
     {
         private Room location;
         private Room _location;
+
+        private static Item StartingItem = new Item("Sample text", "", true, 0);
+        public List<Item> Inventory = new List<Item>{ StartingItem };
 
         private int _moves, _score;
 

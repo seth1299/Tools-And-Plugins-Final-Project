@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using Newtonsoft.Json;
 using Zork.Common;
-using System;
 
 namespace Zork
 {
@@ -17,16 +16,15 @@ namespace Zork
             ConsoleInputService input = new ConsoleInputService();
             ConsoleOutputService output = new ConsoleOutputService();
 
-            game.Player.LocationChanged += Player_LocationChanged;
-
-            output.WriteLine(string.IsNullOrWhiteSpace(game.WelcomeMessage) ? "Welcome to Zork!" : game.WelcomeMessage);
+            output.WriteLine(string.IsNullOrWhiteSpace(game.WelcomeMessage) ? "Welcome to Zork!\n" : ($"{game.WelcomeMessage}\n"));
+            game.Player.Inventory.Clear();
             game.Start((IInputService)input, (IOutputService)output);
-            output.WriteLine(string.IsNullOrWhiteSpace(game.ExitMessage) ? "Thanks for playing!" : game.ExitMessage);
 
-            while (game.IsRunning) //loop
+            Room previousRoom = null;
+
+            while (game.IsRunning)
             {
-                Room previousRoom = null;
-                output.WriteLine(game.Player.Location);
+                output.WriteLine($"Score: {game.Player.Score}\n{game.Player.Location}\n");
                 if (previousRoom != game.Player.Location)
                 {
                     Game.Look(game);
@@ -34,22 +32,12 @@ namespace Zork
                 }
                 
 
-                output.Write("\n> ");
+                output.Write("> ");
                 input.ProcessInput();
             }
 
-            EventHandler<Room> handler = MyHandler;
+            output.WriteLine(string.IsNullOrWhiteSpace(game.ExitMessage) ? "Thanks for playing!" : game.ExitMessage);
 
-
-        }
-
-        private static void Player_LocationChanged(object sender, Room e)
-        {
-            Console.WriteLine($"You moved to {e.Name}");
-        }
-
-        private static void MyHandler(object sender, Room args)
-        {
 
         }
 
